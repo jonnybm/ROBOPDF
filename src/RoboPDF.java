@@ -160,6 +160,7 @@ public class RoboPDF {
 							caminhoNew = caminhoNewBB;
 					  //	}
 						
+							//caminhoNew = caminhoNew.replace("._", "");
 						
 						System.out.println("VAI RENOMEAR PARA: "+caminhoNew+"\n" );
 						
@@ -272,6 +273,8 @@ public class RoboPDF {
 			  String retorno = "";
 			  
 			  
+			  
+			  
 				  //if(linhas[15].equals("------------------------------------------------") || linhas[15].trim() == "------------------------------------------------" || linhas[15] == "------------------------------------------------") //(banco.equals("BB")) // Banco do Brasil
 			  		if(banco.equals("BB"))
 			  		{
@@ -281,6 +284,8 @@ public class RoboPDF {
 					  for (int i = 0; i < linhas.length; i++) 
 					  {
 						
+						  
+						  
 						  if(i == 2) //LINHA 2 Primeira Parte - PEGA a CONTA JUDICIAL
 				          {
 				            		//ret = linhas[i];				            	
@@ -401,16 +406,22 @@ public class RoboPDF {
 					  for (int i = 0; i < linhas.length; i++) // Le array normal
 					  {
 						  
-						  
+						 // System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
 						  
 				          if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
 				          {
 				        	  		gravarCJ = "";
 				        	  		gravarCJ = linhas[i];
-				           		//System.out.println("gravarValor---------"+gravarCJ);
-				           		gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
+//				           		System.out.println("CONTA JUDICIAL---------"+gravarCJ);
+//				           		System.out.println("CONTA gravarCJ.substring(0,2)---------"+gravarCJ.substring(0,2));
+				        	  		
+				        	  		// Se retornar informacao errada como o saldo e nao a CJ deixar em branco
+				        	  		if(gravarCJ.substring(0,2).equals("R$"))
+				        	  				gravarCJ = linhas[19];
+				        	  		else
+				        	  			gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
 //				           		
-				          	// System.out.println("ret-2---------"+gravarCJ);
+//				          	 System.out.println("ret-2---------"+gravarCJ);
 //				           		
 				          }
 
@@ -470,13 +481,15 @@ public class RoboPDF {
 				        	  			
 					        	  		array =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha	
 					        	  		
-				        	  			//se a penultima linha conter a palavra "Emis" siginifica que nao e a lina que tem valor voltar mais 2 linas
+					        	  		//System.out.println("Valor---------->"+Valor.length);
+					        	  		
+					        	  		//se a penultima linha conter a palavra "Emis" siginifica que nao e a lina que tem valor voltar mais 2 linas
 					        	  		if(Valor[1].substring(0, 4).equals("Emis")) {
 					        	  			
 					        	  			Valor =  linhas[i-3].substring(5, linhas[i-3].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
 				        	  			
-					        	  			System.out.println("Valor---------->"+Valor[1]);
-					        	  			System.out.println("Valor---------->"+Valor[2]);
+//					        	  			System.out.println("Valor---------->"+Valor[1]);
+//					        	  			System.out.println("Valor---------->"+Valor[2]);
 					        	  			
 					        	  		}
 
@@ -487,7 +500,11 @@ public class RoboPDF {
 					        	  		retorno = "";
 					        	  		
 					        	  		gravarValor = "";
-					        	  		gravarValor = Valor[2];
+					        	  		if(Valor.length == 4)
+					        	  			gravarValor = Valor[2];
+					        	  		else
+					        	  			gravarValor = Valor[1];
+					        	  			
 					        	  		gravarValor = gravarValor.replace("CRED JUROS", "");
 					        	  		gravarValor = gravarValor.replace("CRED", "");
 					        	  		gravarValor = gravarValor.replace("DB", "");
@@ -498,7 +515,9 @@ public class RoboPDF {
 					        	  		gravarValor = gravarValor.replaceAll("Anterio", "");
 					        	  		gravarValor = gravarValor.replaceAll("DEP.DINH", "");
 					        	  		gravarValor = gravarValor.replaceAll("DEB.AUTOR", "");
-						  			gravarValor = gravarValor.replace("Remunerao", "");
+					        	  		gravarValor = gravarValor.replace("Remunerao", "");
+						  			gravarValor = gravarValor.replace("r", "");
+						  			gravarValor = gravarValor.replace("Saldo","");
 
 					        	  		
 						  			if(gravarValor.equals("0,00"))
