@@ -11,12 +11,14 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class RoboPDF {
 	
 	
-	private static String banco = "BB";  // BB ou CEF
+	private static String banco = "CEF";  // BB ou CEF
 	
 	public static String caminho = "";  // BB ou CEF
 	public static String destino = "";  // BB ou CEF
 	public static String gravarValor = ""; 	
-	public static String gravarCJ = "";
+	public static String gravarCJ = ""; 	
+	//public static String gravarCJCEF = "";
+	public static Boolean findPDF = false;
 	
 	public static int apagarTerceiraTentativaCorrompido = 0;
 
@@ -31,6 +33,7 @@ public class RoboPDF {
             }
 
 	public static void init() throws IOException, InterruptedException {
+		findPDF = true;
 		
 		visualizarArquivos();
 		
@@ -59,14 +62,14 @@ public class RoboPDF {
 				
 				File arquivos = afile[i];
 				arquivoPDF = caminho+arquivos.getName();
-				System.out.println(arquivos.getName());
+				//System.out.println(arquivos.getName());
 				
 				if(arquivos.getName().indexOf ("pdf") >= 0) {
 				
 					//Recebe e Le Texto do PDF
 					String texto = extraiTextoDoPDF(arquivoPDF);
 					
-					System.out.println("CONTEUDO: "+texto);
+					//System.out.println("CONTEUDO: "+texto);
 					
 					
 					if(!texto.equals("NAOePDF") || texto != "NAOePDF") 
@@ -78,7 +81,7 @@ public class RoboPDF {
 						//Trata o PDF lendo linha a linha do array
 						String textoret = trataPDF(linhas);
 						
-						 System.out.println("CONTEUDO: "+textoret);
+						// System.out.println("CONTEUDO: "+textoret);
 						
 						//visualizarArquivos();
 						
@@ -112,15 +115,20 @@ public class RoboPDF {
 						  if((i1+1 == nome.length()) ) 
 						  {
 							  
-							if(banco.equals("BB"))
-						  	{
-								caminhoNew = caminhoNew+" "+gravarCJ+" "+gravarValor; 
-								
-						  	}
-							else if(banco.equals("CEF"))
-							{
-								caminhoNew = caminhoNew+" "+gravarValor+".pdf";
-							}	
+							  caminhoNew = caminhoNew+"  "+gravarValor+"  "+gravarCJ;  
+							  
+//							if(banco.equals("BB"))
+//						  	{
+//								caminhoNew = caminhoNew+" "+gravarValor+" "+gravarCJ; 
+//								
+//						  	}
+//							else if(banco.equals("CEF"))
+//							{
+//								//caminhoNew = caminhoNew+" "+gravarValor+".pdf";
+//								caminhoNew = caminhoNew+" "+gravarValor+" "+gravarCJ;
+//								
+//							}	
+							  
 							  
 						  }
 						}
@@ -128,8 +136,8 @@ public class RoboPDF {
 						//LER CARACTER POR CARACTER PARA PODER FUNCIONAR NO WINDOWS  (PATH + PDF DO BB)
 						caminhoNewBB = "";
 						
-						if(banco.equals("BB"))
-					  	{
+						//if(banco.equals("BB"))
+					  	//{
 							s = new Scanner(caminhoNew);
 							
 							nome = s.nextLine();
@@ -143,23 +151,21 @@ public class RoboPDF {
 							  if((i1+1 == nome.length()) ) 
 							  {
 								  
-								if(banco.equals("BB"))
-							  	{
+								//if(banco.equals("BB"))
+							  	//{
 									caminhoNewBB = caminhoNewBB+".pdf"; 
-									
-									
-							  	}
+							  	//}
 							  }
 							}
 							caminhoNew = caminhoNewBB;
-					  	}
+					  //	}
 						
 						
 						System.out.println("VAI RENOMEAR PARA: "+caminhoNew+"\n" );
 						
 						arquivos.renameTo(new File(caminhoNew));
 												
-						Thread.sleep( 3000 );
+						Thread.sleep( 200 );
 						
 //						  if(arquivoPDF.indexOf ("DS_Store") <= 0) //Se arquivo for diferente de arquivo de sistema que nao precosa ser analizado
 //						  {
@@ -172,6 +178,7 @@ public class RoboPDF {
 				//Renomeia os arquivos.  
 				//arquivos.renameTo(new File("/Volumes/HD/BackupJonny/Projetos/EficienciaFinanceira/PDF", textoret+".pdf"));
 			} 	
+			findPDF = false;
 	  	}
   
 
@@ -227,6 +234,7 @@ public class RoboPDF {
 //				    		}	
 				    		
 				    		//throw new RuntimeException(e);
+			    			findPDF = false;
 				    		break;
 				    		//System.exit(0);
 				    } 
@@ -297,7 +305,7 @@ public class RoboPDF {
 				          {
 				            		ret = linhas[i] ;
 				            		//ret = linhas[i] +" CJ"+ret
-				            		System.out.println("RETT 2 = " + ret);
+				            		//System.out.println("RETT 2 = " + ret);
 				          }
 						  
 						//System.out.println("CONTEDUDO "+linhas[i]);
@@ -344,9 +352,12 @@ public class RoboPDF {
 					        	gravarValor = gravarValor.replaceAll("      ", "");
 					        	gravarValor = gravarValor.replace("CONTA JUDICIAL", "");
 					        	gravarValor =  semAcento(gravarValor.trim());
+					        	
+					        	if(gravarValor.equals("0,00"))
+					  				gravarValor = "ZERO";
 				          }     
 	            
-				          System.out.println("RETT 3 = " + ret);	
+				          //System.out.println("RETT 3 = " + ret);	
 				            
 						 ret = ret.replace("Autor          :", "");
 						 ret = ret.replace("         Saldo do período             ", "");
@@ -372,7 +383,7 @@ public class RoboPDF {
 			        		ret = ret.replaceAll("      ", "");
 			        		ret = ret.replace("CONTA JUDICIAL", "");
 			        		
-			        		System.out.println("CONTEDUDO ret "+ret);
+			        		//System.out.println("CONTEDUDO ret "+ret);
 			                
 			        		
 						 
@@ -392,25 +403,24 @@ public class RoboPDF {
 						  
 						  
 						  
-//				          if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
-//				          {
-//				           		ret = linhas[i];
-//				           		ret = ret.substring(17, ret.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
+				          if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
+				          {
+				        	  		gravarCJ = "";
+				        	  		gravarCJ = linhas[i];
+				           		//System.out.println("gravarValor---------"+gravarCJ);
+				           		gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
 //				           		
-//				          	 System.out.println("ret-2---------"+ret);
+				          	// System.out.println("ret-2---------"+gravarCJ);
 //				           		
-//				          }
+				          }
 
 						  
 				          if(i == 25) //PEGANDO O NOME
 				          {
 				           		//ret = linhas[i];
 				           		//ret = linhas[i] +"  CJ"+ ret;
-				           		
 				        	  		ret = "";
-				        	  		ret = linhas[i];
-				           		
-				           //	 System.out.println("ret-----------"+ret);
+				        	  		ret =  linhas[i]; 
 				           		
 				           		ret = ret.replaceAll("[^\\p{ASCII}]", "");
 				           		ret = ret.replaceAll("//", "");
@@ -452,12 +462,23 @@ public class RoboPDF {
 				        	  			
 				        	  		if(!ret.matches("[0-9]"))//contem apenas numero?
 				        	        {
-					        	  		String[] Valor = null;
+					        	  		
+				        	  			
+				        	  			
+				        	  			String[] Valor = null;
 					        	  		Valor =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
 				        	  			
 					        	  		array =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha	
 					        	  		
+					        	  		//System.out.println("LINHAAAAA >>>>>>>>>>>>>>>>>>>>> "+Valor[1].substring(0, 4));
 
+				        	  			//se a penultima linha conter a palavra "Emis" siginifica que nao e a lina que tem valor voltar mais 2 linas
+					        	  		if(Valor[1].substring(0, 4).equals("Emis")) {
+					        	  			Valor =  linhas[i-4].substring(5, linhas[i-4].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
+				        	  			}
+
+					        	  		
+					        	  		
 					        	  		String retornando = "";
 					        	  		String ArrayValor = "";
 					        	  		retorno = "";
@@ -475,8 +496,12 @@ public class RoboPDF {
 					        	  		gravarValor = gravarValor.replaceAll("DEP.DINH", "");
 					        	  		gravarValor = gravarValor.replaceAll("DEB.AUTOR", "");
 						  			gravarValor = gravarValor.replace("Remunerao", "");
+
 					        	  		
-				        	  			System.out.println("gravarValor :>"+gravarValor);
+						  			if(gravarValor.equals("0,00"))
+						  				gravarValor = "ZERO";
+						  			
+				        	  			//System.out.println("gravarValor :>"+gravarValor);
 
 				        	        }
 				        	  		else {

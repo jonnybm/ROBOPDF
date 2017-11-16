@@ -239,7 +239,7 @@ public class TelaRobo extends javax.swing.JFrame {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						try {
-							Thread.sleep( 30000 );
+							Thread.sleep( 20000 );
 						} catch (InterruptedException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -250,9 +250,17 @@ public class TelaRobo extends javax.swing.JFrame {
 						e.printStackTrace();
 					}
 		             
+		             
+		             
 		             try {
-						Thread.sleep( 30000 );
-					} catch (InterruptedException e) {
+		            	 	// ENQUANTO ESTIVER RENORMENANDO NAO FAZER NADA
+			            	 while(RoboPDF.findPDF)
+			            	 {
+			            		 
+			            	 }	 
+			            	 	Thread.sleep( 10000 );
+					
+		             } catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 						run();
