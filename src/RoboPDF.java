@@ -470,12 +470,15 @@ public class RoboPDF {
 				        	  			
 					        	  		array =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha	
 					        	  		
-					        	  		//System.out.println("LINHAAAAA >>>>>>>>>>>>>>>>>>>>> "+Valor[1].substring(0, 4));
-
 				        	  			//se a penultima linha conter a palavra "Emis" siginifica que nao e a lina que tem valor voltar mais 2 linas
 					        	  		if(Valor[1].substring(0, 4).equals("Emis")) {
-					        	  			Valor =  linhas[i-4].substring(5, linhas[i-4].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
-				        	  			}
+					        	  			
+					        	  			Valor =  linhas[i-3].substring(5, linhas[i-3].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
+				        	  			
+					        	  			System.out.println("Valor---------->"+Valor[1]);
+					        	  			System.out.println("Valor---------->"+Valor[2]);
+					        	  			
+					        	  		}
 
 					        	  		
 					        	  		
