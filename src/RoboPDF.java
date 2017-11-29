@@ -17,6 +17,7 @@ public class RoboPDF {
 	public static String destino = "";  // BB ou CEF
 	public static String gravarValor = ""; 	
 	public static String gravarCJ = ""; 	
+	public static String parcela = ""; 	
 	//public static String gravarCJCEF = "";
 	public static Boolean findPDF = false;
 	
@@ -151,12 +152,42 @@ public class RoboPDF {
 							  if((i1+1 == nome.length()) ) 
 							  {
 								  
-								//if(banco.equals("BB"))
-							  	//{
+								if(banco.equals("CEF"))  // SE FOR POR MAIS UM PARAMETRO VAI TER QUE FICAR COMO IF DE BAIXO
+							  	{
 									caminhoNewBB = caminhoNewBB+".pdf"; 
-							  	//}
+							  	}
+								else if(banco.equals("BB"))
+								{
+									caminhoNewBB = caminhoNewBB+parcela; //por causa disto aqui tive que fazer mais um scanner abaixo
+								}	
+									
 							  }
 							}
+							
+							
+							if(banco.equals("BB")) //LER TUDO DE NOVO SO PARA POR A EXTENSAO .PDF
+							{	
+								s = new Scanner(caminhoNewBB);
+								
+								caminhoNewBB = "";
+								
+								nome = s.nextLine();
+								
+								for(int i1 = 0; i1 < nome.length(); i1++) 
+								{
+								  //System.out.println(nome.charAt(i1));
+								  
+									caminhoNewBB = caminhoNewBB+nome.charAt(i1);
+								  
+								  if((i1+1 == nome.length()) ) 
+								  {
+										caminhoNewBB = caminhoNewBB+".pdf"; 
+								  }
+								}
+							}
+							
+							
+							
 							caminhoNew = caminhoNewBB;
 					  //	}
 						
@@ -166,7 +197,34 @@ public class RoboPDF {
 						
 						arquivos.renameTo(new File(caminhoNew));
 												
-						Thread.sleep( 200 );
+						Thread.sleep( 1000 );
+						
+						
+						
+//						while(!f.exists()) {   
+//						    // Aguarde 5 segundos   
+//							System.out.println("ARQUIVO NAO ENCONTRADO NO STORAGE AGUARDE A TRANSFERENCIA"+arquivoPDF+"\n" );
+//							
+//						    Thread.sleep(2000);
+//						}
+						
+						//APAGA LOCAL APOIS TER TRASNFERIDO
+						
+						//VAI APAGAR O ARQUIVO LOCAL 
+//						System.out.println("APAGANDO LOCAL "+arquivos+"\n" );
+//						System.out.println("MANTEVE DESTINO "+caminhoNew+"\n" );
+						
+						//ARQUIVO DE DESTINO EXISTE JA O ARQUIVO ? SE JA EXISTE APAGA LOCAL
+						File f = new File(caminhoNew);
+					    if(f.exists())
+						{
+			    				//APAGAR LOCAL NAO GUARDAR MAIS NEM CEF NEM BB
+							
+					    		arquivos.delete();
+						}	
+						
+						
+
 						
 //						  if(arquivoPDF.indexOf ("DS_Store") <= 0) //Se arquivo for diferente de arquivo de sistema que nao precosa ser analizado
 //						  {
@@ -305,6 +363,13 @@ public class RoboPDF {
 				            		
 				          }
 						  
+						  if(i == 2) //LINHA 2 Segunda Parte - NUMERO DA PARCELA
+				          {
+			            		//SETANDO A PARCELA
+							  parcela = linhas[i];
+							  parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
+				          }
+						  
 						  
 						  if(i == 8) //Linha 8 Caixa pega o Nome 
 				          {
@@ -406,7 +471,7 @@ public class RoboPDF {
 					  for (int i = 0; i < linhas.length; i++) // Le array normal
 					  {
 						  
-						 // System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
+						  //System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
 						  
 				          if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
 				          {
@@ -421,7 +486,15 @@ public class RoboPDF {
 				        	  		else
 				        	  			gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
 //				           		
-//				          	 System.out.println("ret-2---------"+gravarCJ);
+				          	 
+				        	  		gravarCJ = gravarCJ.replaceAll("/", "");
+				        	  		gravarCJ = gravarCJ.replaceAll("//", "");
+				        	  		gravarCJ = gravarCJ.replaceAll("///", "");
+				        	  		gravarCJ = gravarCJ.replaceAll(" /// ", "");
+				        	  		gravarCJ = gravarCJ.replaceAll(" // ", "");
+				        	  		gravarCJ = gravarCJ.replaceAll(" / ", "");
+				        	  		
+				        	  		//System.out.println("ret-2---------"+gravarCJ);
 //				           		
 				          }
 
@@ -432,14 +505,31 @@ public class RoboPDF {
 				           		//ret = linhas[i] +"  CJ"+ ret;
 				        	  		ret = "";
 				        	  		ret =  linhas[i]; 
-				           		
+				        	  		
+				        	  		ret = ret.replaceAll("\\$", "");
+				        	  		ret = ret.replaceAll("R", "");				        	  		
+				        	  		ret = ret.replaceAll("$", "");
+				        	  		ret = ret.replaceAll("R", "");
+				        	  		ret = ret.replaceAll("R$", "");
+				        	  		ret = ret.replaceAll("\\R$", "");
+				        	  		ret = ret.replaceAll("(R$)", "NAO FOI POSSIVEL PEGAR O NOME");
+				        	  		ret = ret.replaceAll("\\R$", "");
+				        	  		ret = ret.replaceAll("\\(", "");
+				        	  		ret = ret.replaceAll("\\)", "");
 				           		ret = ret.replaceAll("[^\\p{ASCII}]", "");
-				           		ret = ret.replaceAll("//", "");
 				           		ret = ret.replaceAll("/", "");
+				           		ret = ret.replaceAll("//", "");
+				           		ret = ret.replaceAll("///", "");
+				           		ret = ret.replaceAll(" /// ", "");
+				           		ret = ret.replaceAll(" // ", "");
+				           		ret = ret.replaceAll(" / ", "");
+
 				           		ret = ret.replaceAll("#", "");
 				           		ret = ret.replaceAll("Saldodoperodo", "");
 					        		ret = ret.replaceAll("Saldodoperodo", "");
 					        		ret = ret.replaceAll("Anterio", "");
+					        		ret = ret.replaceAll("Saldo Data do Movimento Valor Documento Histrico", "    ");
+					        		
 
 					        		ret = ret.replaceAll("..-", "");
 				        	  		ret = ret.replaceAll("Anterio", "");
@@ -458,7 +548,8 @@ public class RoboPDF {
 				        	  		ret = ret.replace("9", "");
 				        	  		ret = ret.replace("0", "");
 				        	  		ret = ret.replace(".", "");
-					        		// System.out.println("ret---------->"+ret);
+				        	  		
+				        	  		//System.out.println("ret---------->"+ret);
 				           		
 				          }
 				          
@@ -479,9 +570,12 @@ public class RoboPDF {
 				        	  			String[] Valor = null;
 					        	  		Valor =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha
 				        	  			
-					        	  		array =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha	
+					        	  		//array =  linhas[i].substring(5, linhas[i].length()-1).split(" ");// Pega a linha e Tira a Data que contem incialmente na linha faz Splito para pegar o segundo valor da Linha	
 					        	  		
-					        	  		//System.out.println("Valor---------->"+Valor.length);
+//					        	  		System.out.println("QTDE---------->"+Valor.length);
+//					        	  		System.out.println("Valor---------->"+Valor[0]);
+//					        	  		System.out.println("Valor---------->"+Valor[1]);
+//					        	  		System.out.println("Valor---------->"+Valor[2]);
 					        	  		
 					        	  		//se a penultima linha conter a palavra "Emis" siginifica que nao e a lina que tem valor voltar mais 2 linas
 					        	  		if(Valor[1].substring(0, 4).equals("Emis")) {
@@ -500,11 +594,19 @@ public class RoboPDF {
 					        	  		retorno = "";
 					        	  		
 					        	  		gravarValor = "";
-					        	  		if(Valor.length == 4)
-					        	  			gravarValor = Valor[2];
-					        	  		else
-					        	  			gravarValor = Valor[1];
-					        	  			
+					        	  		//if(Valor.length == 4)
+					        	  		//	gravarValor = Valor[2];
+					        	  		//else
+					        	  		//	gravarValor = Valor[1];
+					        	  		
+					        	  		gravarValor = Valor[2];
+					        	  		
+					        	  		
+
+					        	  		gravarValor = gravarValor.replace("Saldo Anterior", "");
+					        	  		gravarValor = gravarValor.replace("DB T UNIAO", "");
+					        	  		gravarValor = gravarValor.replace("DEB", "");
+					        	  		gravarValor = gravarValor.replace("LEV.ALVAR", "");
 					        	  		gravarValor = gravarValor.replace("CRED JUROS", "");
 					        	  		gravarValor = gravarValor.replace("CRED", "");
 					        	  		gravarValor = gravarValor.replace("DB", "");
