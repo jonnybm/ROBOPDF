@@ -1,8 +1,11 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.Scanner;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -11,7 +14,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class RoboPDF {
 	
 	
-	private static String banco = "CEF";  // BB ou CEF
+	private static String banco = "RECURSAL";  // BB , CEF OU RECURSAL
 	
 	public static String caminho = "";  // BB ou CEF
 	public static String destino = "";  // BB ou CEF
@@ -53,6 +56,7 @@ public class RoboPDF {
 		  	//caminho = "/Volumes/HD/BackupJonny/Projetos/EficienciaFinanceira/PDFBB/";
 		  	//destino = "/Volumes/HD/BackupJonny/Projetos/EficienciaFinanceira/PDFBB/";
 		  	String arquivoPDF = "";
+		  	String texto = "";
 		  
 		  
 		  	File file = new File(caminho);
@@ -61,26 +65,32 @@ public class RoboPDF {
 			
 			for (int j = afile.length; i < j; i++) {
 				
+				texto = "";
+				
 				File arquivos = afile[i];
 				arquivoPDF = caminho+arquivos.getName();
 				//System.out.println(arquivos.getName());
 				
-				if(arquivos.getName().indexOf ("pdf") >= 0) {
+				if(arquivos.getName().indexOf ("pdf") >= 0 || arquivos.getName().indexOf ("doc") >= 0) {
 				
-					//Recebe e Le Texto do PDF
-					String texto = extraiTextoDoPDF(arquivoPDF);
+					
+					//SE FOR BB OU CAIXA O EXTRATO E EM PDF
+					if(banco.equals("BB") || banco.equals("CEF"))
+						 texto = extraiTextoDoPDF(arquivoPDF);
+					else if (banco.equals("RECURSAL"))// SE FOR RECURSAL O EXTRATO E EM WORD
+						texto = extraiTextoDoWORD(arquivoPDF);
 					
 					//System.out.println("CONTEUDO: "+texto);
 					
 					
-					if(!texto.equals("NAOePDF") || texto != "NAOePDF") 
+					if(!texto.equals("NAOeDOCVALIDO") || texto != "NAOeDOCVALIDO") 
 					{
 						//Recebe o Conteudo do PDF e coloca em Array com quebra de Linha
 						String linhas[] = texto.split("\n");
 						
 				        					        			
 						//Trata o PDF lendo linha a linha do array
-						String textoret = trataPDF(linhas);
+						String textoret = trataRetornoPDFeWord(linhas);
 						
 						// System.out.println("CONTEUDO: "+textoret);
 						
@@ -160,6 +170,10 @@ public class RoboPDF {
 								{
 									caminhoNewBB = caminhoNewBB+parcela; //por causa disto aqui tive que fazer mais um scanner abaixo
 								}	
+								if(banco.equals("RECURSAL"))  // SE FOR POR MAIS UM PARAMETRO VAI TER QUE FICAR COMO IF DE BAIXO
+							  	{
+									caminhoNewBB = caminhoNewBB+".doc"; 
+							  	}
 									
 							  }
 							}
@@ -178,10 +192,12 @@ public class RoboPDF {
 								  //System.out.println(nome.charAt(i1));
 								  
 									caminhoNewBB = caminhoNewBB+nome.charAt(i1);
-								  
+									caminhoNewBB = caminhoNewBB.trim();
+									
 								  if((i1+1 == nome.length()) ) 
 								  {
-										caminhoNewBB = caminhoNewBB+".pdf"; 
+										caminhoNewBB = caminhoNewBB+".pdf";
+										caminhoNewBB = caminhoNewBB.trim();
 								  }
 								}
 							}
@@ -197,7 +213,7 @@ public class RoboPDF {
 						
 						arquivos.renameTo(new File(caminhoNew));
 												
-						Thread.sleep( 1000 );
+						Thread.sleep( 500 );
 						
 						
 						
@@ -247,18 +263,18 @@ public class RoboPDF {
 			  //ARQUIVOS OCULTOS MAC
 			  if(caminho.indexOf ("DS_Store") >= 0) {
 				  
-				  return "NAOePDF";
+				  return "NAOeDOCVALIDO";
 			  }
 
 			  //ARQUIVOS OCULTOS WINDOWS
 			  if(caminho.indexOf ("desktop") >= 0 || caminho.indexOf ("desktop.ini") >= 0) {
 				  
-				  return "NAOePDF";
+				  return "NAOeDOCVALIDO";
 			  }
 
 			  // SE NAO FOR ARQUIVO PDF
 			  if(caminho.indexOf ("pdf") < 0) {
-				  return "NAOePDF";
+				  return "NAOeDOCVALIDO";
 			  }
 			  
 			  
@@ -285,12 +301,6 @@ public class RoboPDF {
 			    			
 			    			System.out.println("APAGOU ARQUIVO CORROMPIDO : "+ caminho);
 				    		
-//				    		apagarTerceiraTentativaCorrompido ++;
-//				    		
-//				    		if(apagarTerceiraTentativaCorrompido == 3)
-//				    		{
-//				    			apagarTerceiraTentativaCorrompido = 0;
-//				    		}	
 				    		
 				    		//throw new RuntimeException(e);
 			    			findPDF = false;
@@ -311,20 +321,54 @@ public class RoboPDF {
 				    			}
 				    }
 		        
-				//    return "NAOePDF";
+				//    return "NAOeDOCVALIDO";
 		        	}
-		        	while (!ok);
-		        		return "NAOePDF";
+		        		while (!ok);
+		        			return "NAOeDOCVALIDO";
 		  		}  
-				    //return "NAOePDF";
+				    //return "NAOeDOCVALIDO";
 		  
 	
 		  
+		  	//EXTRAI INFORMACOES CAIXA RECURSAL EM WORD
+			 public static String extraiTextoDoWORD(String caminho) throws IOException {
+				 BufferedReader br = new BufferedReader(new FileReader(caminho)); 
+				 String linha = "";
+				 
+				  // SE NAO FOR ARQUIVO PDF
+				  if(caminho.indexOf ("doc") < 0) {
+					  return "NAOeDOCVALIDO";
+				  }
+				 
+				 
+			     while (br.ready()) {
+			          linha = linha + "\n" +br.readLine();
+			          //System.out.println(linha);
+
+			     }
+			
+			     String linhas[] = linha.split("\n");
+				//System.out.println("CONTEUDO :>"+linha + " ]");
+
+			     
+			     
+			     for (int i = 0; i < linhas.length; i++) 
+				  {
+					  
+					  String ret = linhas[i];
+					  
+					//System.out.println("CONTEUDO :>"+ret + " ["+i+"]");
+				  }
+			     
+			     
+			     br.close();
+				return linha;
+			 }
 
 		  
 		  
 		  
-		  public static String trataPDF(String[] linhas) 
+		  public static String trataRetornoPDFeWord(String[] linhas) 
 		  {
 			  
 			  String ret = "";
@@ -353,13 +397,17 @@ public class RoboPDF {
 							  	gravarCJ	= "";
 				            		
 				            		gravarCJ = linhas[i];
-				            		gravarCJ = gravarCJ.substring(26, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
+				            		
+				            		//AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
+				            		//gravarCJ = gravarCJ.substring(26, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
+				            		gravarCJ = gravarCJ.substring(16, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
 				            		gravarCJ = gravarCJ.replace("C", "");
 				            		gravarCJ = gravarCJ.replace("c", "");
 				            		gravarCJ = gravarCJ.replace("P", "");
 				            		gravarCJ = gravarCJ.replace("p", "");
+				            		gravarCJ = gravarCJ.replace("    ", "");
 				            		gravarCJ =  semAcento(gravarCJ.trim());
-				            		//System.out.println("RETT 1 = " + gravarCJ);
+				            		//System.out.println("RETT 1 = "+ gravarCJ);
 				            		
 				          }
 						  
@@ -367,13 +415,18 @@ public class RoboPDF {
 				          {
 			            		//SETANDO A PARCELA
 							  parcela = linhas[i];
-							  parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
+							  
+							  //AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
+							  //parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
+							  parcela = "-"+parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
 				          }
 						  
 						  
 						  if(i == 8) //Linha 8 Caixa pega o Nome 
 				          {
-				            		ret = linhas[i] ;
+							  //AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
+							  //ret = linhas[i] ;
+				            		ret ="";
 				            		//ret = linhas[i] +" CJ"+ret
 				            		//System.out.println("RETT 2 = " + ret);
 				          }
@@ -423,8 +476,13 @@ public class RoboPDF {
 					        	gravarValor = gravarValor.replace("CONTA JUDICIAL", "");
 					        	gravarValor =  semAcento(gravarValor.trim());
 					        	
+					        	
 					        	if(gravarValor.equals("0,00"))
 					  				gravarValor = "ZERO";
+					        	else
+						        	//AQUI TIRAR ESTA VARIAVEL VOLTAR MODO ANTIGO DE GRAVAR COM NOME POIS ELA ZERA TUDO QUE FEZ ACIMA
+						        	gravarValor = "";	
+					        		
 				          }     
 	            
 				          //System.out.println("RETT 3 = " + ret);	
@@ -507,9 +565,7 @@ public class RoboPDF {
 				        	  		ret =  linhas[i]; 
 				        	  		
 				        	  		ret = ret.replaceAll("\\$", "");
-				        	  		ret = ret.replaceAll("R", "");				        	  		
 				        	  		ret = ret.replaceAll("$", "");
-				        	  		ret = ret.replaceAll("R", "");
 				        	  		ret = ret.replaceAll("R$", "");
 				        	  		ret = ret.replaceAll("\\R$", "");
 				        	  		ret = ret.replaceAll("(R$)", "NAO FOI POSSIVEL PEGAR O NOME");
@@ -641,7 +697,116 @@ public class RoboPDF {
 					  
 					  ret =  semAcento(ret);
 					  return ret;
+				}
+			  	// SE NAO É PDF CAIXA  
+				else if(banco.equals("RECURSAL")) //Caixa Economica Federal
+				{
+					  
+					System.out.println("EXTRATO CAIXA RECURSAL");
+					  
+					  for (int i = 0; i < linhas.length; i++) // Le array normal
+					  {
+						  
+						  //System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
+						  
+				          if(i == 4) //PEGANDO CONTA JUDICIAL
+				          {
+				        	  		gravarCJ = "";
+				        	  		gravarCJ = linhas[i];
+				        	  		
+
+				        	  		//PEGANDO APENAS NUMERO INTEIRO DA STRING PARA RESGATAR O DODIGO DO EMPREDADO
+				           		String numeros = gravarCJ;
+				           		Pattern p = Pattern.compile("[0-9]+");
+				           		Matcher m = p.matcher(numeros);
+
+				           		StringBuilder nroExtraidos = new StringBuilder();
+				           		while (m.find()) {
+				           		    nroExtraidos.append(m.group().trim());
+				           		}
+				           		gravarCJ = nroExtraidos.toString();
+				           		System.out.println("CODIGO EMPREGADO---------"+gravarCJ);
+				           		
+				           		
+				           		
+				           		
+				        	  		
+				        	  		//System.out.println("ret-2---------"+gravarCJ);
+//				           		
+				          }
+
+						  
+				          if(i == 4) //PEGANDO O NOME
+				          {
+				           		//ret = linhas[i];
+				           		//ret = linhas[i] +"  CJ"+ ret;
+				        	  		ret = "";
+				        	  		ret =  linhas[i]; 
+				        	  		
+				        	  		ret = ret.replaceAll("CODIGO EMPREGADO--------- COD.EMPRG. :","");
+				        	  		ret = ret.replaceAll("COD.EMPRG. :","");
+				        	  		ret = ret.replaceAll(gravarCJ,"");
+				        	  		ret = ret.replaceAll("DEP","");
+				        	  		ret = ret.trim();
+				        	  		
+				        	  		System.out.println("NOME EMPREGADO---------"+ret);
+				        	  		//ret =  linhas[i].split("");
+				        	  		
+				        	  		
+				        	  		
+				        	  		
+				        	  		
+				        	  		//System.out.println("ret---------->"+ret);
+				           		
+				          }
+				          
+				          
+				          String[] array ;
+				          
+				          //PEGANDO O VALOR
+				          if(linhas.length-1 == i)//é o Ultimo  Registro?
+				          {
+				        	  			
+				        	  		if(!ret.matches("[0-9]"))//contem apenas numero?
+				        	        {
+					        	  		
+					        	  		
+					        	  		String retornando = "";
+					        	  		String ArrayValor = "";
+					        	  		retorno = "";
+					        	  		
+					        	  		gravarValor = "";
+					        	  		
+					        	  		gravarValor = linhas[i];
+					        	  		
+					        	  		
+
+					        	  		gravarValor = gravarValor.replace("TOTAL SALDO DISPONIVEL", "");
+					        	  		gravarValor = gravarValor.trim();
+
+					        	  		
+						  			if(gravarValor.equals("0,00"))
+						  				gravarValor = "ZERO";
+						  			
+				        	  			System.out.println("TOTAL SALDO DISPONIVEL :>>>>>>>>"+gravarValor);
+
+				        	        }
+				        	  		else {
+				        	  			ret =  ret; //se sim para nao dar erro envia apenas o nome
+				        	  		}
+				        	  		
+				          }
+
+					  }
+					  //RETORNA CAIXA
+					  
+					//  System.out.println("RETORNAR__________>: "+ret);	  
+					  
+					  ret =  semAcento(ret);
+					  return ret;
 				}	
+			  		
+			  		
 				  
 				  ret =  semAcento(ret);
 				  

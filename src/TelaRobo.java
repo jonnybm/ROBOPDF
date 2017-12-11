@@ -256,9 +256,9 @@ public class TelaRobo extends javax.swing.JFrame {
 		            	 	// ENQUANTO ESTIVER RENORMENANDO NAO FAZER NADA
 			            	 while(RoboPDF.findPDF)
 			            	 {
-			            		 
+			            		 Thread.sleep( 30000 ); //ESPERAR 20 Segundos
 			            	 }	 
-			            	 	Thread.sleep( 10000 );
+			            	 	Thread.sleep( 3600000 ); //ESPERAR 3 Minutos
 					
 		             } catch (InterruptedException e) {
 						// TODO Auto-generated catch block
