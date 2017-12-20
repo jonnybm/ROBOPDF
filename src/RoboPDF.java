@@ -14,7 +14,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class RoboPDF {
 	
 	
-	private static String banco = "RECURSAL";  // BB , CEF OU RECURSAL
+	private static String banco = "BB";  // BB , CEF OU RECURSAL
 	
 	public static String caminho = "";  // BB ou CEF
 	public static String destino = "";  // BB ou CEF
@@ -192,12 +192,16 @@ public class RoboPDF {
 								  //System.out.println(nome.charAt(i1));
 								  
 									caminhoNewBB = caminhoNewBB+nome.charAt(i1);
-									caminhoNewBB = caminhoNewBB.trim();
+									
+									//TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA
+									//caminhoNewBB = caminhoNewBB.trim();
 									
 								  if((i1+1 == nome.length()) ) 
 								  {
 										caminhoNewBB = caminhoNewBB+".pdf";
-										caminhoNewBB = caminhoNewBB.trim();
+										
+										//TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA										
+										//caminhoNewBB = caminhoNewBB.trim();
 								  }
 								}
 							}
@@ -213,7 +217,7 @@ public class RoboPDF {
 						
 						arquivos.renameTo(new File(caminhoNew));
 												
-						Thread.sleep( 500 );
+						Thread.sleep( 100 );
 						
 						
 						
@@ -398,9 +402,10 @@ public class RoboPDF {
 				            		
 				            		gravarCJ = linhas[i];
 				            		
-				            		//AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
-				            		//gravarCJ = gravarCJ.substring(26, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
-				            		gravarCJ = gravarCJ.substring(16, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
+				            		
+				            		gravarCJ = gravarCJ.substring(26, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
+				            		//TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA
+				            		//gravarCJ = gravarCJ.substring(16, gravarCJ.length() -12);  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA
 				            		gravarCJ = gravarCJ.replace("C", "");
 				            		gravarCJ = gravarCJ.replace("c", "");
 				            		gravarCJ = gravarCJ.replace("P", "");
@@ -415,18 +420,23 @@ public class RoboPDF {
 				          {
 			            		//SETANDO A PARCELA
 							  parcela = linhas[i];
+
 							  
-							  //AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
-							  //parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
-							  parcela = "-"+parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
+							  //parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL 
+							  parcela = "  Parcela "+  parcela.substring(parcela.length() - 3,parcela.length());  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
+							  System.out.println("RPARCELA = "+ parcela);							 
+							  
+							  
+							  //TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA
+							  //parcela = "-"+parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
 				          }
 						  
 						  
 						  if(i == 8) //Linha 8 Caixa pega o Nome 
 				          {
-							  //AQUI TIRAR COMENTARIO PARA RENOMEAR FORMA ANTIGA COM NOME
-							  //ret = linhas[i] ;
-				            		ret ="";
+							  ret = linhas[i] ;
+							  //TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA	
+							  //ret ="";
 				            		//ret = linhas[i] +" CJ"+ret
 				            		//System.out.println("RETT 2 = " + ret);
 				          }
@@ -479,9 +489,9 @@ public class RoboPDF {
 					        	
 					        	if(gravarValor.equals("0,00"))
 					  				gravarValor = "ZERO";
-					        	else
-						        	//AQUI TIRAR ESTA VARIAVEL VOLTAR MODO ANTIGO DE GRAVAR COM NOME POIS ELA ZERA TUDO QUE FEZ ACIMA
-						        	gravarValor = "";	
+					       //else
+					        		//TIRAR ESTA EO ELSE DE CIMA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA
+					        		//gravarValor = "";	
 					        		
 				          }     
 	            
