@@ -14,7 +14,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class RoboPDF {
 	
 	
-	private static String banco = "BB";  // BB , CEF OU RECURSAL
+	private static String banco = "CEF";  // BB , CEF OU RECURSAL
 	
 	public static String caminho = "";  // BB ou CEF
 	public static String destino = "";  // BB ou CEF
@@ -377,6 +377,7 @@ public class RoboPDF {
 			  
 			  String ret = "";
 			  String retorno = "";
+			  boolean EXTRATOFALTACAMPOS = false;
 			  
 			  
 			  
@@ -464,17 +465,17 @@ public class RoboPDF {
 				        	  	gravarValor = gravarValor.replace("Autor          :", "");
 				        	  	gravarValor = gravarValor.replace("         Saldo do período             ", "");
 				        	  	gravarValor = gravarValor.replace("          Saldo do período            ", "");
-				        	  	gravarValor = gravarValor.replace("    Saldo do periodo    ", "");
+				        	  	gravarValor = gravarValor.replace("    Saldo do periodo    ", "");
 				        	  	gravarValor = gravarValor.replace("/", "");
 				        	  	gravarValor = gravarValor.replace("                ", "");
 				        	  	gravarValor = gravarValor.replace("Reclamante", "");
 				        	  	gravarValor = gravarValor.replace(":", "");
 				        	  	gravarValor = gravarValor.replace("     ", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo ", "");
+				        	  	gravarValor = gravarValor.replace("     Saldo do periodo ", "");
 				        	  	gravarValor = gravarValor.replace("Autor", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
-				        	  	gravarValor = gravarValor.replace("Saldo do periodo", "");
+				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
+				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
+				        	  	gravarValor = gravarValor.replace("Saldo do periodo", "");
 				        	  	gravarValor = gravarValor.replaceAll("[^\\p{ASCII}]", "");
 				        	  	gravarValor = gravarValor.replaceAll("//", "");
 				        	  	gravarValor = gravarValor.replaceAll("/", "");
@@ -500,17 +501,17 @@ public class RoboPDF {
 						 ret = ret.replace("Autor          :", "");
 						 ret = ret.replace("         Saldo do período             ", "");
 						 ret = ret.replace("          Saldo do período            ", "");
-						 ret = ret.replace("    Saldo do periodo    ", "");
+						 ret = ret.replace("    Saldo do periodo    ", "");
 						 ret = ret.replace("/", "");
 						 ret = ret.replace("                ", "");
 						 ret = ret.replace("Reclamante", "");
 						 ret = ret.replace(":", "");
 						 ret = ret.replace("     ", "");
-						 ret = ret.replace("     Saldo do periodo ", "");
+						 ret = ret.replace("     Saldo do periodo ", "");
 						 ret = ret.replace("Autor", "");
-						 ret = ret.replace("     Saldo do periodo    ", "");
-						 ret = ret.replace("     Saldo do periodo    ", "");
-						 ret = ret.replace("Saldo do periodo", "");
+						 ret = ret.replace("     Saldo do periodo    ", "");
+						 ret = ret.replace("     Saldo do periodo    ", "");
+						 ret = ret.replace("Saldo do periodo", "");
 			           	ret = ret.replaceAll("[^\\p{ASCII}]", "");
 			           	ret = ret.replaceAll("//", "");
 			        		ret = ret.replaceAll("/", "");
@@ -539,20 +540,54 @@ public class RoboPDF {
 					  for (int i = 0; i < linhas.length; i++) // Le array normal
 					  {
 						  
-						  //System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
+						 // System.out.println("LINHA PDF  = " + linhas[i] +"  Linha:" + i );
 						  
-				          if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
+						  
+						 //CASE SEJA UM EXTRA COM POSICAO ERRADA DE CONTA JUDICAL 
+						if(i == 18)							
+		        	        {
+							if( linhas[18].length()  == 20 || linhas[18].length()  == 21)  // No Mac 20 e no Windows 21 
+							{
+								EXTRATOFALTACAMPOS = false;
+								//System.out.println("EXTRATOFALTACAMPOS = false <-------"+ linhas[18].length());
+							}
+							else
+							{
+								//System.out.println("EXTRATOFALTACAMPOS = TRUE <-------"+ linhas[18].length());
+								EXTRATOFALTACAMPOS = true;
+		        	        
+							}
+		        	        }  
+ 
+						  
+				          //if(i == 20 && linhas[i].length() >= 8) //PEGANDO CONTA JUDICIAL
+				        	  if(i == 20) //PEGANDO CONTA JUDICIAL
 				          {
 				        	  		gravarCJ = "";
 				        	  		gravarCJ = linhas[i];
 //				           		System.out.println("CONTA JUDICIAL---------"+gravarCJ);
 //				           		System.out.println("CONTA gravarCJ.substring(0,2)---------"+gravarCJ.substring(0,2));
 				        	  		
-				        	  		// Se retornar informacao errada como o saldo e nao a CJ deixar em branco
-				        	  		if(gravarCJ.substring(0,2).equals("R$"))
-				        	  				gravarCJ = linhas[19];
-				        	  		else
-				        	  			gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
+								if(EXTRATOFALTACAMPOS && linhas[19].length() >= 8)//Quantidade é igual a quantidade de uma CJ tamanho 20? && a Conta Judicial da linha 19 tem mais que 8 digitos caracterizando assim uma conta juridica
+				        	        {
+									gravarCJ = linhas[19];
+									gravarCJ = gravarCJ.substring(17, gravarCJ.length());
+									//System.out.println("CONTEM NAO CONTEM APENAS NUMERO <-------"+ linhas[19]);
+									//System.out.println("CONTEM NAO CONTEM APENAS NUMERO TAMNHO <-------"+ linhas[19].length());
+				        	        }
+								else if(linhas[i].length() >= 8) // Linha 20  conta judicial devera ter mais que 8 digitos
+								{
+									gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
+									
+									//System.out.println("CONTEM APENAS NUMERO <------"+ linhas[i]);
+								}	
+				        	  		
+				        	  		
+//				        	  		// Se retornar informacao errada como o saldo e nao a CJ deixar em branco
+//				        	  		if(gravarCJ.substring(0,2).equals("R$"))
+//				        	  				gravarCJ = linhas[19];
+//				        	  		else
+//				        	  			gravarCJ = gravarCJ.substring(17, gravarCJ.length());  //FAZ SUBSTRING PARA TIRAR O NUMERO DE PARCELA DA STRING
 //				           		
 				          	 
 				        	  		gravarCJ = gravarCJ.replaceAll("/", "");
@@ -572,7 +607,16 @@ public class RoboPDF {
 				           		//ret = linhas[i];
 				           		//ret = linhas[i] +"  CJ"+ ret;
 				        	  		ret = "";
-				        	  		ret =  linhas[i]; 
+				        	  		
+				        	  		if(EXTRATOFALTACAMPOS)
+				        	        {
+				        	  			ret =  linhas[24];	
+				        	        }
+				        	  		else
+				        	  		{	
+				        	  			ret =  linhas[i]; 
+				        	  		}
+				        	  		
 				        	  		
 				        	  		ret = ret.replaceAll("\\$", "");
 				        	  		ret = ret.replaceAll("$", "");
