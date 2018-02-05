@@ -227,47 +227,64 @@ public class TelaRobo extends javax.swing.JFrame {
 //	        		//WINDOWS
 //	        		RoboPDF.caminho = pastaPDF+"\\";
 //	        		RoboPDF.destino = pathRenomearPDF+"\\";
+		            
 	        		
+	        		try 
+	        		{
+		           	 RoboPDF.init();
+						
+		        } catch (IOException e) 
+		        {
+						// TODO Auto-generated catch block
+		        	 	e.printStackTrace();
+				} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		             
+
+		             
+		         	jtaArea.setContentType("text/html"); 
+		         	jtaArea.setText("<html></body><center><h2><br><br><font color=#0056ee>FINALIZADO COM SUCESSO!!</font></h2><center></body></html>"); 
+		             
 	        		
-	        		while(true){
-	             
-		             try 
-		             {
-		            	 	RoboPDF.init();
-		             } catch (IOException e) 
-		             {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						try {
-							Thread.sleep( 20000 );
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						run();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-		             
-		             
-		             
-		             try {
-		            	 	// ENQUANTO ESTIVER RENORMENANDO NAO FAZER NADA
-			            	 while(RoboPDF.findPDF)
-			            	 {
-			            		 Thread.sleep( 30000 ); //ESPERAR 20 Segundos
-			            	 }	 
-			            	 	Thread.sleep( 3600000 ); //ESPERAR 3 Minutos
-					
-		             } catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-						run();
-					}
-		             
-	        		            
-	        		}
+//	        		while(true){
+//	             
+//		             try 
+//		             {
+//		            	 	RoboPDF.init();
+//		             } catch (IOException e) 
+//		             {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						try {
+//							Thread.sleep( 20000 );
+//						} catch (InterruptedException e1) {
+//							// TODO Auto-generated catch block
+//							e1.printStackTrace();
+//						}
+//						run();
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//		             
+//		             
+//		             
+//		             try {
+//		            	 	// ENQUANTO ESTIVER RENORMENANDO NAO FAZER NADA
+//			            	 while(RoboPDF.findPDF)
+//			            	 {
+//			            		 Thread.sleep( 30000 ); //ESPERAR 20 Segundos
+//			            	 }	 
+//			            	 	Thread.sleep( 3600000 ); //ESPERAR 3 Minutos
+//					
+//		             } catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//						run();
+//					}
+//	        		}
 			}
 		}.start();
 

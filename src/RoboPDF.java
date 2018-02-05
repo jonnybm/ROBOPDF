@@ -14,13 +14,14 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class RoboPDF {
 	
 	
-	private static String banco = "CEF";  // BB , CEF OU RECURSAL
+	private static String banco = "RECURSAL";  // BB , CEF OU RECURSAL
 	
 	public static String caminho = "";  // BB ou CEF
 	public static String destino = "";  // BB ou CEF
 	public static String gravarValor = ""; 	
 	public static String gravarCJ = ""; 	
 	public static String parcela = ""; 	
+	public static String anoMesBB = " ";
 	//public static String gravarCJCEF = "";
 	public static Boolean findPDF = false;
 	
@@ -52,6 +53,7 @@ public class RoboPDF {
 		  	String caminhoNovo = "";
 		  	String caminhoNew = "";
 		  	String caminhoNewBB = "";
+		  	String concatenar = "";
 
 		  	//caminho = "/Volumes/HD/BackupJonny/Projetos/EficienciaFinanceira/PDFBB/";
 		  	//destino = "/Volumes/HD/BackupJonny/Projetos/EficienciaFinanceira/PDFBB/";
@@ -114,7 +116,6 @@ public class RoboPDF {
 						caminhoNew = "";
 						
 						Scanner s = new Scanner(caminhoNovo);
-						
 						String nome = s.nextLine();
 						
 						for(int i1 = 0; i1 < nome.length(); i1++) 
@@ -125,20 +126,70 @@ public class RoboPDF {
 						  
 						  if((i1+1 == nome.length()) ) 
 						  {
+  
+							  	nome = null;	
+							  	s = null;
+							  	
+							  	s = new Scanner(anoMesBB);								
+								nome = s.nextLine();
 							  
-							  caminhoNew = caminhoNew+"  "+gravarValor+"  "+gravarCJ;  
+								for(int i11 = 0; i11 < nome.length(); i11++) 
+								{
+								  
+								  caminhoNew = caminhoNew+nome.charAt(i11);
+								  
+								  if((i11+1 == nome.length()) ) 
+								  {
+									  	caminhoNew = caminhoNew+" ";
+									  	
+									  	nome = null;	
+									  	s = null;
+
+									  	
+									  	s = new Scanner(gravarValor);								
+										nome = s.nextLine();
+										
+										
+									  
+										for(int i111 = 0; i111 < nome.length(); i111++) 
+										{
+										  
+										  caminhoNew = caminhoNew+nome.charAt(i111);
+										  
+										  if((i111+1 == nome.length()) ) 
+										  {
+											  
+											   	caminhoNew = caminhoNew+" ";
+											   	
+											  	nome = null;	
+											  	s = null;
+
+												
+											   	s = new Scanner(gravarCJ);								
+												nome = s.nextLine();
+											  
+												for(int i1111 = 0; i1111 < nome.length(); i1111++) 
+												{
+												  caminhoNew = caminhoNew+nome.charAt(i1111);
+												  
+												  if((i1111+1 == nome.length()) ) 
+												  {
+													  break;
+												  }
+												}
+											break;
+										  }
+										}
+									break;
+								  }
+							 
+								}
 							  
-//							if(banco.equals("BB"))
-//						  	{
-//								caminhoNew = caminhoNew+" "+gravarValor+" "+gravarCJ; 
-//								
-//						  	}
-//							else if(banco.equals("CEF"))
-//							{
-//								//caminhoNew = caminhoNew+" "+gravarValor+".pdf";
-//								caminhoNew = caminhoNew+" "+gravarValor+" "+gravarCJ;
-//								
-//							}	
+							  
+								System.out.println("CAMINHO TODO 3: "+caminhoNew+"\n" );
+							  
+							//  caminhoNew = caminhoNew+anoMesBB+"  "+gravarValor+"  "+gravarCJ; 
+							 // System.out.println("CAMINHO TODO 3: "+caminhoNew+"\n" );
 							  
 							  
 						  }
@@ -425,7 +476,7 @@ public class RoboPDF {
 							  
 							  //parcela = "  Parcela "+ parcela.substring(parcela.length() - 2);  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL 
 							  parcela = "  Parcela "+  parcela.substring(parcela.length() - 3,parcela.length());  //FAZ SUBSTRING PARA PRIMEIRA PARTE DA CONTA JUDICIAL
-							  System.out.println("RPARCELA = "+ parcela);							 
+							//  System.out.println("RPARCELA = "+ parcela);							 
 							  
 							  
 							  //TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA
@@ -439,7 +490,23 @@ public class RoboPDF {
 							  //TIRAR ESTA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA	
 							  //ret ="";
 				            		//ret = linhas[i] +" CJ"+ret
-				            		//System.out.println("RETT 2 = " + ret);
+				            		//System.out.println("NOME = " + ret);
+				          }
+						  
+						  if(i == 18) //LINHA 18 PARA PEGAR O MES E O ANO DO EXTRATO
+				          {
+				            	
+							//  System.out.println("VALOR DO DEPOSITO :|"+linhas[i]+"|");  
+//							anoMesBB = linhas[i];
+//
+							  anoMesBB = "_"+linhas[i].substring(6,8)+linhas[i].substring(3, 5);
+							//System.out.println("MES + ANO :|"+	anoMesBB);  
+							
+//				            	getSetBB.setDataMesConsulta(ret.substring(3, 5));
+//				            	System.out.println("MES DO DEPOSITO :|"+	getSetBB.getDataMesConsulta()+"|");  
+//				            	
+//				            	getSetBB.setDataAnoConsulta("20"+ret.substring(6, 8));
+//				            	System.out.println("ANO DO DEPOSITO :|"+	getSetBB.getDataAnoConsulta()+"|"); 
 				          }
 						  
 						//System.out.println("CONTEDUDO "+linhas[i]);
@@ -460,35 +527,26 @@ public class RoboPDF {
 				        	  		gravarValor = linhas[i-1];
 				        	  	}	
 				        	  	
-				        	  	gravarValor = gravarValor.replace("C", "");
-				        	  	gravarValor = gravarValor.replace("c", "");
-				        	  	gravarValor = gravarValor.replace("Autor          :", "");
-				        	  	gravarValor = gravarValor.replace("         Saldo do período             ", "");
-				        	  	gravarValor = gravarValor.replace("          Saldo do período            ", "");
-				        	  	gravarValor = gravarValor.replace("    Saldo do periodo    ", "");
-				        	  	gravarValor = gravarValor.replace("/", "");
-				        	  	gravarValor = gravarValor.replace("                ", "");
-				        	  	gravarValor = gravarValor.replace("Reclamante", "");
-				        	  	gravarValor = gravarValor.replace(":", "");
-				        	  	gravarValor = gravarValor.replace("     ", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo ", "");
-				        	  	gravarValor = gravarValor.replace("Autor", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
-				        	  	gravarValor = gravarValor.replace("     Saldo do periodo    ", "");
-				        	  	gravarValor = gravarValor.replace("Saldo do periodo", "");
-				        	  	gravarValor = gravarValor.replaceAll("[^\\p{ASCII}]", "");
-				        	  	gravarValor = gravarValor.replaceAll("//", "");
-				        	  	gravarValor = gravarValor.replaceAll("/", "");
-				        	  	gravarValor = gravarValor.replaceAll("#", "");
-				        	  	gravarValor = gravarValor.replaceAll("Saldodoperodo", "");
-				        	  	gravarValor = gravarValor.replaceAll("Saldo do período", "");
-				        	  	gravarValor = gravarValor.replaceAll("Saldo do perodo", "");
-					        	gravarValor = gravarValor.replaceAll("      ", "");
-					        	gravarValor = gravarValor.replace("CONTA JUDICIAL", "");
-					        	gravarValor =  semAcento(gravarValor.trim());
+				            	String[] parts = null;
+			            	 	parts = gravarValor.split(" ");
+			            		
+			            	 	//PEGA O VALOR ULTIMO CONTEUDO
+			            	 	gravarValor = parts[parts.length-1];
+			            	 	gravarValor = gravarValor.replaceAll("C", "");
+			            	 	gravarValor = gravarValor.replaceAll("c", "");
+			            	 	gravarValor = gravarValor.replaceAll("D", "");
+			            	 	gravarValor = gravarValor.replaceAll("d", "");
+				        	  	
+				        	  	
+				        	  	System.out.println("gravarValor ret "+gravarValor);
+				        	  	
+
 					        	
 					        	
 					        	if(gravarValor.equals("0,00"))
+					  				gravarValor = "ZERO";
+					        	
+					        	if(gravarValor.equals("0.00"))
 					  				gravarValor = "ZERO";
 					       //else
 					        		//TIRAR ESTA EO ELSE DE CIMA LINHA PARA VOLTAR A GRAVAR COMO NOME/CJ/SALDO/PARCELA E DESCOMENTAR A DE CIMA
@@ -779,7 +837,7 @@ public class RoboPDF {
 				           		    nroExtraidos.append(m.group().trim());
 				           		}
 				           		gravarCJ = nroExtraidos.toString();
-				           		System.out.println("CODIGO EMPREGADO---------"+gravarCJ);
+				           		//System.out.println("CODIGO EMPREGADO---------"+gravarCJ);
 				           		
 				           		
 				           		
@@ -803,7 +861,7 @@ public class RoboPDF {
 				        	  		ret = ret.replaceAll("DEP","");
 				        	  		ret = ret.trim();
 				        	  		
-				        	  		System.out.println("NOME EMPREGADO---------"+ret);
+				        	  		//System.out.println("NOME EMPREGADO---------"+ret);
 				        	  		//ret =  linhas[i].split("");
 				        	  		
 				        	  		
@@ -842,7 +900,7 @@ public class RoboPDF {
 						  			if(gravarValor.equals("0,00"))
 						  				gravarValor = "ZERO";
 						  			
-				        	  			System.out.println("TOTAL SALDO DISPONIVEL :>>>>>>>>"+gravarValor);
+				        	  			//System.out.println("TOTAL SALDO DISPONIVEL :>>>>>>>>"+gravarValor);
 
 				        	        }
 				        	  		else {
